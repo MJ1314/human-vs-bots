@@ -1,0 +1,27 @@
+{
+  "name": "juans-jungle-adventure",
+  "version": "0.1.0",
+  "description": "A 2D side-scrolling action-adventure game where Juan searches for lost treasure in the jungle",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "remove-white-bg": "node scripts/remove-white-bg.js"
+  },
+  "dependencies": {
+    "ai": "^6.0.62",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1",
+    "phaser": "^3.80.1",
+    "sharp": "^0.34.5",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "typescript": "^5.4.5",
+    "vite": "^5.4.2"
+  }
+}

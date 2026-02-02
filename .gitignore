@@ -1,0 +1,9 @@
+.env
+/ps_files/*
+.cursor/nal-trace/*
+node_modules/*
+.specstory/*
+package-lock.json
+.DS_Store
+*.psd
+Gemini_Generated*
