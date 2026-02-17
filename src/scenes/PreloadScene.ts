@@ -8,15 +8,15 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/GameConfig';
 
 // Import assets using Vite's asset handling (returns resolved URLs)
-import juanIdleUrl from '../assets/juan/animations/juan_idle.png';
-import juanRunUrl from '../assets/juan/animations/running_animation.png';
-import juanJumpUrl from '../assets/juan/animations/jumping_animation.png';
+import juanIdleUrl from '../assets/juan/animations/juan_gorilla_idle.png';
+import juanRunUrl from '../assets/juan/animations/juan_gorilla_running.png';
+import juanJumpUrl from '../assets/juan/animations/juan_gorilla_jumping.png';
 import juanKickUrl from '../assets/juan/animations/juan_sidekick.png';
-import juanPunchUrl from '../assets/juan/animations/juan_punch.png';
-import juanUppercutUrl from '../assets/juan/animations/juan_uppercut.png';
+import juanPunchUrl from '../assets/juan/animations/juan_gorilla_punch.png';
+import juanUppercutUrl from '../assets/juan/animations/juan_gorilla_uppercut.png';
 import juanSidekick2Url from '../assets/juan/animations/sidekick_2_animation.png';
-import juanAerialPunchUrl from '../assets/juan/animations/aereal_punch_animation.png';
-import juanGettingPunchedUrl from '../assets/juan/animations/juan_getting_punched_animation.png';
+import juanAerialPunchUrl from '../assets/juan/animations/juan_gorilla_aerial_punch.png';
+import juanGettingPunchedUrl from '../assets/juan/animations/juan_gorilla_getting_punched.png';
 import juanGettingPunchedStomachUrl from '../assets/juan/animations/juan_getting_punched_stomach.png';
 import juanDodgeUrl from '../assets/juan/animations/juan_dodge_punch_animation.png';
 import juanMatrixDodgeUrl from '../assets/juan/animations/juan_matrix_style_dodge.png';
@@ -81,8 +81,7 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 400,
     });
-    // punch: 6 columns, but frame 2-3 share the same image (wide punch impact)
-    // Animation will skip frame 3 to avoid duplicate
+    // punch: 6 standard frames (guard, wind-up, jab, impact, retract, recovery)
     this.load.spritesheet('juan-punch', juanPunchUrl, {
       frameWidth: 200,
       frameHeight: 400,
@@ -280,11 +279,6 @@ export class PreloadScene extends Phaser.Scene {
     const enemyJumpSidekickTexture = this.textures.get('enemy-jump-sidekick');
     enemyJumpSidekickTexture.add('jump_kick_extend', 0, 600, 0, 400, 400);   // slots 4+5: x=0, y=400, width=400, height=400
     enemyJumpSidekickTexture.add('jump_kick_follow', 0, 0, 400, 400, 400); // slots 6+7: x=400, y=400, width=400, height=400
-
-    // Add custom wide frame for punch impact (frames 2+3 combined = 400px wide)
-    // This allows displaying the full punch impact as a single frame
-    const punchTexture = this.textures.get('juan-punch');
-    punchTexture.add('impact', 0, 400, 0, 400, 400); // x=400, y=0, width=400, height=400
 
     // Add custom wide frames for sidekick2 (frames 4-5 and 6-7 are 400px wide)
     const sidekick2Texture = this.textures.get('juan-sidekick2');

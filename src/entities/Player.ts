@@ -157,15 +157,16 @@ export class Player {
       yoyo: true, // Play forward then backward (kick out and return)
     });
 
-    // Punch animation - uses custom 'impact' frame that combines frames 2+3 (400px wide)
-    // Sequence: stance -> wind-up -> punch impact (wide) -> follow-through -> recovery -> back
+    // Punch animation - 6 standard frames (200px each)
+    // Sequence: guard -> wind-up -> jab -> impact -> retract -> recovery
     this.scene.anims.create({
       key: 'juan-punch',
       frames: [
-        { key: 'juan-punch', frame: 0 },      // stance
+        { key: 'juan-punch', frame: 0 },      // guard stance
         { key: 'juan-punch', frame: 1 },      // wind-up
-        { key: 'juan-punch', frame: 'impact' }, // full punch (400px wide, frames 2+3 combined)
-        { key: 'juan-punch', frame: 4 },      // follow-through
+        { key: 'juan-punch', frame: 2 },      // jab thrust
+        { key: 'juan-punch', frame: 3 },      // impact
+        { key: 'juan-punch', frame: 4 },      // retract
         { key: 'juan-punch', frame: 5 },      // recovery
       ],
       frameRate: 12,
@@ -888,8 +889,8 @@ export class Player {
     // Adjust hitbox for different attacks
     switch (this.currentAttackType) {
       case 'punch':
-        // Punch hitbox - check if we're on the impact frame
-        if (anim.key === 'juan-punch' && currentFrame.frame.name === 'impact') {
+        // Punch hitbox - check if we're on the impact frame (index 3 in the animation)
+        if (anim.key === 'juan-punch' && currentFrame.index >= 2 && currentFrame.index <= 3) {
           hitboxWidth = 100;
           offsetX = this.facingRight ? 60 : -60;
         } else {
