@@ -48,7 +48,7 @@ export class GameScene extends Phaser.Scene {
 
   private createBackground(): void {
     // Add background image anchored at left edge, vertically centered
-    const bg = this.add.image(0, GAME_HEIGHT / 2, 'bg-server-lab');
+    const bg = this.add.image(0, GAME_HEIGHT / 2, 'bg-overgrown-city-sunset');
     bg.setOrigin(0, 0.5);
 
     // Scale to cover full height while maintaining aspect ratio
@@ -180,22 +180,25 @@ export class GameScene extends Phaser.Scene {
     groundGfx.generateTexture('ground-texture', GAME_WIDTH, GROUND_HEIGHT);
     groundGfx.destroy();
 
-    // Create platform texture
+    // Create platform texture (narrower than visual so overgrown platform art covers it)
+    const PLATFORM_COLLISION_WIDTH = 260;
     const platGfx = this.add.graphics();
     platGfx.fillStyle(0x6b7280, 1);
-    platGfx.fillRect(0, 0, 350, 20);
-    platGfx.generateTexture('platform-texture', 350, 20);
+    platGfx.fillRect(0, 0, PLATFORM_COLLISION_WIDTH, 20);
+    platGfx.generateTexture('platform-texture', PLATFORM_COLLISION_WIDTH, 20);
     platGfx.destroy();
 
 
-    // Ground - position is center of sprite (y = bottom - half height)
-    const ground = this.ground.create(GAME_WIDTH / 2, GAME_HEIGHT - GROUND_HEIGHT / 2, 'ground-texture') as Phaser.Physics.Arcade.Sprite;
+    // Ground - position center lower so collision top is hidden under overgrown ground visual
+    const GROUND_OFFSET_Y = 28;
+    const ground = this.ground.create(GAME_WIDTH / 2, GAME_HEIGHT - GROUND_HEIGHT / 2 + GROUND_OFFSET_Y, 'ground-texture') as Phaser.Physics.Arcade.Sprite;
     ground.refreshBody();
 
-    // Floating platforms
-    this.createPlatform(200, GAME_HEIGHT - 500);
-    this.createPlatform(600, GAME_HEIGHT - 325);
-    this.createPlatform(1100, GAME_HEIGHT - 450);
+    // Floating platforms (offset down so collision + visual move together)
+    const FLOATING_PLATFORM_OFFSET_Y = 24;
+    this.createPlatform(200, GAME_HEIGHT - 500 + FLOATING_PLATFORM_OFFSET_Y);
+    this.createPlatform(600, GAME_HEIGHT - 325 + FLOATING_PLATFORM_OFFSET_Y);
+    this.createPlatform(1100, GAME_HEIGHT - 450 + FLOATING_PLATFORM_OFFSET_Y);
   }
 
   private createPlatform(x: number, y: number): void {
@@ -206,21 +209,22 @@ export class GameScene extends Phaser.Scene {
     const platform = this.ground.create(x, y - collisionOffset, 'platform-texture') as Phaser.Physics.Arcade.Sprite;
     platform.refreshBody();
 
-    // Add visual scaffolding image at original y position
-    const scaffolding = this.add.image(x, y, 'floating-scaffolding');
-    // Scale to 2x the platform width (400px visual, 200px collision box)
-    const scale = (200 / scaffolding.width) * 2;
-    scaffolding.setScale(scale);
+    // Add visual platform image (overgrown style); visual is wider than collision so it covers the box
+    const visualOffsetY = 26;
+    const platformImage = this.add.image(x, y + visualOffsetY, 'floating-platform');
+    const visualWidth = 350;
+    const scale = visualWidth / platformImage.width;
+    platformImage.setScale(scale);
     // Anchor from bottom-center so the platform surface aligns with collision
-    scaffolding.setOrigin(0.5, 0.95);
+    platformImage.setOrigin(0.5, 0.95);
     // Depth between background and player
-    scaffolding.setDepth(0);
+    platformImage.setDepth(0);
   }
 
   private createFloorVisual(): void {
     // Add the visual floor image on top of the collision floor
     // Position at bottom of screen, anchor from bottom-left
-    const floorImage = this.add.image(0, GAME_HEIGHT, 'floor-server-lab');
+    const floorImage = this.add.image(0, GAME_HEIGHT, 'floor-overgrown-city');
     floorImage.setOrigin(0, 1); // Anchor at bottom-left
 
     // Scale to cover the full game width while maintaining aspect ratio

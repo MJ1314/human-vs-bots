@@ -30,12 +30,16 @@ import menuMusicUrl from '../assets/audio/menu_music.mp3';
 
 // Backgrounds
 import serverLabBgUrl from '../assets/backgrounds/server_lab.png';
+import overgrownCityBgUrl from '../assets/backgrounds/overgrown_city.png';
+import overgrownCitySunsetBgUrl from '../assets/backgrounds/overgrown_city_sunset.png';
 
 // Menu assets
 import juanMenuUrl from '../assets/juan_sidekick_main_menu.png';
 
 // Props - Platforms
 import serverLabFloorUrl from '../assets/props/platforms/server_lab_floor.png';
+import overgrownGroundFloorUrl from '../assets/props/platforms/overgrown_ground_floor.png';
+import overgrownFloatingPlatformUrl from '../assets/props/platforms/overgrown_floating_platform_350.png';
 import floatingScaffoldingUrl from '../assets/props/platforms/floating_scaffolding.png';
 
 // Props - Powerups
@@ -138,12 +142,16 @@ export class PreloadScene extends Phaser.Scene {
 
     // Load backgrounds
     this.load.image('bg-server-lab', serverLabBgUrl);
+    this.load.image('bg-overgrown-city', overgrownCityBgUrl);
+    this.load.image('bg-overgrown-city-sunset', overgrownCitySunsetBgUrl);
 
     // Load menu assets
     this.load.image('juan-menu', juanMenuUrl);
 
     // Load props - platforms
     this.load.image('floor-server-lab', serverLabFloorUrl);
+    this.load.image('floor-overgrown-city', overgrownGroundFloorUrl);
+    this.load.image('floating-platform', overgrownFloatingPlatformUrl);
     this.load.image('floating-scaffolding', floatingScaffoldingUrl);
 
     // Load props - powerups
