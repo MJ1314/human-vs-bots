@@ -46,8 +46,8 @@ import floatingScaffoldingUrl from '../assets/props/platforms/floating_scaffoldi
 import powerBoosterUrl from '../assets/props/powerups/power-booster.png';
 
 // Enemy sprites
-import enemyIdleUrl from '../assets/enemy_human/enemy_idle.png';
-import enemyRunningUrl from '../assets/enemy_human/enemy_running.png';
+import enemyIdleUrl from '../assets/enemy_human/enemy_blockhead_idle.png';
+import enemyRunningUrl from '../assets/enemy_human/enemy_blockhead_running.png';
 import enemyPunchUrl from '../assets/enemy_human/enemy_punch.png';
 import enemySidekickUrl from '../assets/enemy_human/enemy_sidekick_animation.png';
 import enemyJumpSidekickUrl from '../assets/enemy_human/enemy_jump_sidekick.png';
@@ -163,7 +163,7 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 400,
     });
-    // enemy_running: 8 frames (6 on top row, 2 on bottom row)
+    // enemy_running: 1200×1200 sheet, 8 frames (6 on top row, 2 on bottom row)
     this.load.spritesheet('enemy-running', enemyRunningUrl, {
       frameWidth: 200,
       frameHeight: 400,
