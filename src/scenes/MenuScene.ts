@@ -718,7 +718,7 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.fadeOut(400, 0, 0, 0);
 
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('Game');
+      this.scene.start('Versus');
     });
   }
 }

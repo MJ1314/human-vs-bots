@@ -30,6 +30,7 @@ import menuMusicUrl from '../assets/audio/menu_music.mp3';
 import serverLabBgUrl from '../assets/backgrounds/server_lab.png';
 import overgrownCityBgUrl from '../assets/backgrounds/overgrown_city.png';
 import overgrownCitySunsetBgUrl from '../assets/backgrounds/overgrown_city_sunset.png';
+import versusBgUrl from '../assets/backgrounds/versus.png';
 
 // Menu assets
 import juanMenuUrl from '../assets/juan_sidekick_main_menu.png';
@@ -130,6 +131,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('bg-server-lab', serverLabBgUrl);
     this.load.image('bg-overgrown-city', overgrownCityBgUrl);
     this.load.image('bg-overgrown-city-sunset', overgrownCitySunsetBgUrl);
+    this.load.image('versus-bg', versusBgUrl);
 
     // Load menu assets
     this.load.image('juan-menu', juanMenuUrl);

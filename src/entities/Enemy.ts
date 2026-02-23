@@ -233,6 +233,8 @@ export class Enemy {
   }
 
   update(): void {
+    if (!this.scene.registry.get('matchStarted')) return;
+
     const delta = this.scene.game.loop.delta;
 
     // Update invincibility timer

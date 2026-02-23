@@ -122,8 +122,46 @@ export class GameScene extends Phaser.Scene {
     this.createHealthBars();
     console.log('[GameScene] HealthBars created');
 
+    // Countdown before match starts (3, 2, 1) - movement gated by registry 'matchStarted'
+    this.registry.set('matchStarted', false);
+    this.createCountdown();
+
     // Register shutdown handler to clean up event listeners
     this.events.once('shutdown', this.shutdown, this);
+  }
+
+  private createCountdown(): void {
+    const countdownY = 140;
+    const countdownText = this.add.text(GAME_WIDTH / 2, countdownY, '3', {
+      fontFamily: 'Quantico, Russo One, Arial',
+      fontSize: '120px',
+      fontStyle: 'bold',
+      color: '#ffffff',
+      stroke: '#000000',
+      strokeThickness: 8,
+    });
+    countdownText.setOrigin(0.5, 0.5);
+    countdownText.setDepth(500);
+
+    const showNumber = (n: number) => {
+      countdownText.setText(String(n));
+      countdownText.setScale(0.5);
+      this.tweens.add({
+        targets: countdownText,
+        scale: 1.2,
+        duration: 250,
+        ease: 'Back.easeOut',
+        onComplete: () => countdownText.setScale(1),
+      });
+    };
+
+    this.time.delayedCall(0, () => showNumber(3));
+    this.time.delayedCall(1000, () => showNumber(2));
+    this.time.delayedCall(2000, () => showNumber(1));
+    this.time.delayedCall(3000, () => {
+      countdownText.destroy();
+      this.registry.set('matchStarted', true);
+    });
   }
 
   private createPauseMenu(): void {

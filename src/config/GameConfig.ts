@@ -9,6 +9,7 @@ import { BootScene } from '../scenes/BootScene.ts';
 import { PreloadScene } from '../scenes/PreloadScene.ts';
 import { MenuScene } from '../scenes/MenuScene.ts';
 import { GameScene } from '../scenes/GameScene.ts';
+import { VersusScene } from '../scenes/VersusScene.ts';
 import { StoryScene } from '../scenes/StoryScene.ts';
 import { CreditsScene } from '../scenes/CreditsScene.ts';
 
@@ -49,7 +50,7 @@ export const gameConfig: Phaser.Types.Core.GameConfig = {
   },
 
   // Scene order - first runs first
-  scene: [BootScene, PreloadScene, MenuScene, GameScene, StoryScene, CreditsScene],
+  scene: [BootScene, PreloadScene, MenuScene, VersusScene, GameScene, StoryScene, CreditsScene],
 
   // Rendering settings for detailed artwork (not pixel art)
   render: {
