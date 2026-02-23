@@ -39,9 +39,7 @@ const CONFIG = {
 /** Damage values for different attacks */
 const DAMAGE = {
   PUNCH: 10,
-  KICK: 12,
   UPPERCUT: 20, // Combo punch
-  SIDEKICK: 24, // Combo kick
   AERIAL_PUNCH: 15,
 };
 
@@ -74,13 +72,8 @@ export class Player {
   private comboTimer: number = 0;
   private comboDelayTimer: number = 0;
 
-  // Kick combo system (X → kick, X+X → sidekick)
-  private kickComboCount: number = 0;
-  private kickComboTimer: number = 0;
-  private kickComboDelayTimer: number = 0;
-
   // Input buffer - queue next attack during current animation
-  private bufferedAttack: 'punch' | 'uppercut' | 'kick' | 'sidekick' | 'aerial-punch' | null = null;
+  private bufferedAttack: 'punch' | 'uppercut' | 'aerial-punch' | null = null;
 
   // Jump buffer - allows pressing jump slightly before landing
   private jumpBufferTimer: number = 0;
@@ -93,7 +86,7 @@ export class Player {
   private healthBar: HealthBar | null = null;
 
   // Attack tracking for hitbox generation
-  private currentAttackType: 'punch' | 'uppercut' | 'kick' | 'sidekick' | 'aerial-punch' | null = null;
+  private currentAttackType: 'punch' | 'uppercut' | 'aerial-punch' | null = null;
 
   // Counter-dodge system - callbacks for enemy warning checks
   private isAnyEnemyShowingWarning: (() => boolean) | null = null;
@@ -148,15 +141,6 @@ export class Player {
       repeat: 0, // Play once and hold last frame
     });
 
-    // Kick/attack animation - 6 frames (row 1 of 6x3 grid), plays forward then backward
-    this.scene.anims.create({
-      key: 'juan-kick',
-      frames: this.scene.anims.generateFrameNumbers('juan-kick', { start: 0, end: 5 }),
-      frameRate: 18,
-      repeat: 0,
-      yoyo: true, // Play forward then backward (kick out and return)
-    });
-
     // Punch animation - 6 standard frames (200px each)
     // Sequence: guard -> wind-up -> jab -> impact -> retract -> recovery
     this.scene.anims.create({
@@ -181,24 +165,6 @@ export class Player {
       frameRate: 14,
       repeat: 0,
       yoyo: true, // Play forward then backward
-    });
-
-    // Sidekick2 animation - custom frames with wide kick_extend and kick_follow
-    // Sequence: stance -> windup -> kick start -> kick mid -> kick_extend (wide) -> kick_follow (wide) -> return1 -> return2
-    this.scene.anims.create({
-      key: 'juan-sidekick2',
-      frames: [
-        { key: 'juan-sidekick2', frame: 0 },           // stance
-        { key: 'juan-sidekick2', frame: 1 },           // windup
-        { key: 'juan-sidekick2', frame: 2 },           // kick start
-        { key: 'juan-sidekick2', frame: 3 },           // kick mid
-        { key: 'juan-sidekick2', frame: 'kick_extend' }, // full extension (400px wide)
-        { key: 'juan-sidekick2', frame: 'kick_follow' }, // follow through (400px wide)
-        { key: 'juan-sidekick2', frame: 8 },           // returning
-        { key: 'juan-sidekick2', frame: 9 },           // back to stance
-      ],
-      frameRate: 14,
-      repeat: 0,
     });
 
     // Aerial punch animation - uses custom wide frames (frames 1+2 and 3+4 combined = 400px each)
@@ -308,17 +274,6 @@ export class Player {
     }
     if (this.comboDelayTimer > 0) {
       this.comboDelayTimer -= delta;
-    }
-
-    // Update kick combo timers
-    if (this.kickComboTimer > 0) {
-      this.kickComboTimer -= delta;
-      if (this.kickComboTimer <= 0) {
-        this.kickComboCount = 0; // Reset kick combo if window expired
-      }
-    }
-    if (this.kickComboDelayTimer > 0) {
-      this.kickComboDelayTimer -= delta;
     }
 
     // Update invincibility timer
@@ -548,21 +503,13 @@ export class Player {
 
     // Cache key states (JustDown only returns true once per press)
     const punchPressed = this.inputManager.isPunchPressed();
-    const kickPressed = this.inputManager.isKickPressed();
     const uppercutPressed = this.inputManager.isUppercutPressed();
-    const sidekickPressed = this.inputManager.isSidekickPressed();
     const isAttacking = this.currentState === PlayerState.ATTACKING;
     const isAirborne = !this.isOnGround();
 
     // Aerial punch - only C (punch) while in the air triggers aerial punch
-    // X (kick) and Z (sidekick) do nothing in the air
     if (isAirborne && !isAttacking && punchPressed) {
       this.performAerialPunch();
-      return;
-    }
-
-    // Ignore kick and sidekick inputs while airborne (keep jump animation)
-    if (isAirborne && (kickPressed || sidekickPressed)) {
       return;
     }
 
@@ -576,21 +523,10 @@ export class Player {
       return;
     }
 
-    // X key combo: second X during kick = sidekick (but only after min delay)
-    if (kickPressed && this.kickComboCount === 1 && this.kickComboDelayTimer <= 0) {
-      this.bufferedAttack = null; // Clear buffer, combo takes priority
-      this.performSidekick2();
-      this.kickComboCount = 0;
-      this.kickComboTimer = 0;
-      return;
-    }
-
     // Buffer inputs while attacking (queue next attack)
     if (isAttacking) {
       if (punchPressed) this.bufferedAttack = isAirborne ? 'aerial-punch' : 'punch';
       else if (uppercutPressed) this.bufferedAttack = 'uppercut';
-      else if (kickPressed && !isAirborne) this.bufferedAttack = 'kick';
-      else if (sidekickPressed && !isAirborne) this.bufferedAttack = 'sidekick';
       return;
     }
 
@@ -606,16 +542,7 @@ export class Player {
       return;
     }
 
-    // Z key = sidekick (direct)
-    if (sidekickPressed) {
-      this.performSidekick2();
-      return;
-    }
-
-    // X key = kick (first press starts combo)
-    if (kickPressed) {
-      this.performKick();
-    }
+    // Kick/sidekick removed
   }
 
   private onAttackComplete(): void {
@@ -630,12 +557,6 @@ export class Player {
           break;
         case 'uppercut':
           this.performUppercut();
-          break;
-        case 'kick':
-          this.performKick();
-          break;
-        case 'sidekick':
-          this.performSidekick2();
           break;
         case 'aerial-punch':
           this.performAerialPunch();
@@ -655,31 +576,6 @@ export class Player {
     this.comboCount = 1;
     this.comboTimer = this.COMBO_WINDOW;
     this.comboDelayTimer = this.COMBO_MIN_DELAY;
-    this.sprite.once('animationcomplete', () => {
-      this.currentAttackType = null;
-      this.onAttackComplete();
-    });
-  }
-
-  private performKick(): void {
-    this.currentState = PlayerState.ATTACKING;
-    this.currentAttackType = 'kick';
-    this.sprite.play('juan-kick');
-    this.scene.sound.play('kick-sfx', { volume: 0.5 });
-    this.kickComboCount = 1;
-    this.kickComboTimer = this.COMBO_WINDOW;
-    this.kickComboDelayTimer = this.COMBO_MIN_DELAY;
-    this.sprite.once('animationcomplete', () => {
-      this.currentAttackType = null;
-      this.onAttackComplete();
-    });
-  }
-
-  private performSidekick2(): void {
-    this.currentState = PlayerState.ATTACKING;
-    this.currentAttackType = 'sidekick';
-    this.sprite.play('juan-sidekick2');
-    this.scene.sound.play('kick-sfx', { volume: 0.6 });
     this.sprite.once('animationcomplete', () => {
       this.currentAttackType = null;
       this.onAttackComplete();
@@ -800,7 +696,7 @@ export class Player {
         }
         break;
       case PlayerState.ATTACKING:
-        this.sprite.play('juan-kick');
+        // Keep current attack animation playing
         break;
     }
   }
@@ -897,15 +793,6 @@ export class Player {
           return null; // Not in hit frame yet
         }
         break;
-      case 'kick':
-        // Kick hitbox - middle frames
-        if (anim.key === 'juan-kick' && currentFrame.index >= 2 && currentFrame.index <= 3) {
-          hitboxWidth = 90;
-          offsetX = this.facingRight ? 55 : -55;
-        } else {
-          return null;
-        }
-        break;
       case 'uppercut':
         // Uppercut hitbox - upward strike
         if (anim.key === 'juan-uppercut' && currentFrame.index >= 1 && currentFrame.index <= 3) {
@@ -913,16 +800,6 @@ export class Player {
           hitboxHeight = 80;
           offsetX = this.facingRight ? 40 : -40;
           offsetY = -50; // Higher up
-        } else {
-          return null;
-        }
-        break;
-      case 'sidekick':
-        // Sidekick hitbox - wide kick
-        if (anim.key === 'juan-sidekick2' &&
-          (currentFrame.frame.name === 'kick_extend' || currentFrame.frame.name === 'kick_follow')) {
-          hitboxWidth = 120;
-          offsetX = this.facingRight ? 70 : -70;
         } else {
           return null;
         }
@@ -955,12 +832,8 @@ export class Player {
     switch (this.currentAttackType) {
       case 'punch':
         return DAMAGE.PUNCH;
-      case 'kick':
-        return DAMAGE.KICK;
       case 'uppercut':
         return DAMAGE.UPPERCUT;
-      case 'sidekick':
-        return DAMAGE.SIDEKICK;
       case 'aerial-punch':
         return DAMAGE.AERIAL_PUNCH;
       default:

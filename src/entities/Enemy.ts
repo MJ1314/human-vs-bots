@@ -57,7 +57,7 @@ export class Enemy {
   private healthBar: HealthBar | null = null;
 
   // Attack system
-  private currentAttackType: 'punch' | 'sidekick' | 'jump_sidekick' | null = null;
+  private currentAttackType: 'punch' | 'sidekick' | null = null;
 
   // Attack warning system
   private warningContainer: Phaser.GameObjects.Container | null = null;
@@ -193,23 +193,6 @@ export class Enemy {
       });
     }
 
-    if (!this.scene.anims.exists('enemy-jump-sidekick')) {
-      // Jump sidekick animation - aerial sidekick attack
-      // Sequence: 4 prep frames -> extended flying kick
-      this.scene.anims.create({
-        key: 'enemy-jump-sidekick',
-        frames: [
-          { key: 'enemy-jump-sidekick', frame: 0 },                // stance
-          { key: 'enemy-jump-sidekick', frame: 1 },                // crouch prep
-          { key: 'enemy-jump-sidekick', frame: 2 },                // knee up
-          { key: 'enemy-jump-sidekick', frame: 'jump_kick_extend' }, // full extension (400px wide)
-          { key: 'enemy-jump-sidekick', frame: 'jump_kick_follow' }, // follow through (400px wide)
-        ],
-        frameRate: 16,
-        repeat: 0, // Play once
-        yoyo: true, // Play forward then backward
-      });
-    }
 
     if (!this.scene.anims.exists('enemy-getting-punched')) {
       // Getting punched animation - 5 frames, hurt/damage reaction
@@ -228,17 +211,6 @@ export class Enemy {
       });
     }
 
-    if (!this.scene.anims.exists('enemy-getting-punched-stomach')) {
-      // Getting punched in stomach animation - 5 frames, gut punch reaction
-      // Sequence: standing -> brace -> doubled over -> recovery
-      this.scene.anims.create({
-        key: 'enemy-getting-punched-stomach',
-        frames: this.scene.anims.generateFrameNumbers('enemy-getting-punched-stomach', { start: 0, end: 4 }),
-        frameRate: 18,
-        repeat: 0,
-        yoyo: true,
-      });
-    }
   }
 
   private setupPhysicsBody(): void {
@@ -326,20 +298,10 @@ export class Enemy {
 
   private performSidekick(): void {
     const body = this.sprite.body as Phaser.Physics.Arcade.Body;
-    const isAirborne = !body.onFloor();
-    const isRunning = Math.abs(body.velocity.x) > 50; // Has significant horizontal velocity
-
     this.currentState = EnemyState.ATTACKING;
-
-    if (isAirborne || isRunning) {
-      // Use jump sidekick when in the air or running
-      this.currentAttackType = 'jump_sidekick';
-      this.sprite.play('enemy-jump-sidekick');
-    } else {
-      // Use regular sidekick when standing still on the ground
-      this.currentAttackType = 'sidekick';
-      this.sprite.play('enemy-sidekick');
-    }
+    // Always use regular sidekick now
+    this.currentAttackType = 'sidekick';
+    this.sprite.play('enemy-sidekick');
 
     this.scene.sound.play('kick-sfx', { volume: 0.5 });
     this.sprite.once('animationcomplete', () => {
@@ -354,7 +316,7 @@ export class Enemy {
 
     // Don't move while attacking on the ground (except jump sidekick), or while hurt
     if (this.currentState === EnemyState.HURT ||
-        (this.currentState === EnemyState.ATTACKING && this.currentAttackType !== 'jump_sidekick')) {
+        this.currentState === EnemyState.ATTACKING) {
       body.setAccelerationX(0);
       return;
     }
@@ -381,21 +343,12 @@ export class Enemy {
 
     if (movingLeft) {
       body.setAccelerationX(-CONFIG.ACCELERATION);
-      // Don't change facing direction during jump sidekick (committed to direction)
-      if (this.currentAttackType !== 'jump_sidekick') {
-        this.facingRight = false;
-      }
+      this.facingRight = false;
     } else if (movingRight) {
       body.setAccelerationX(CONFIG.ACCELERATION);
-      // Don't change facing direction during jump sidekick (committed to direction)
-      if (this.currentAttackType !== 'jump_sidekick') {
-        this.facingRight = true;
-      }
+      this.facingRight = true;
     } else {
-      // During jump sidekick, maintain momentum instead of stopping
-      if (this.currentAttackType !== 'jump_sidekick') {
-        body.setAccelerationX(0);
-      }
+      body.setAccelerationX(0);
     }
   }
 
@@ -607,12 +560,9 @@ export class Enemy {
     this.isInvincible = true;
     this.invincibilityTimer = CONFIG.INVINCIBILITY_DURATION;
 
-    // Play appropriate hurt animation based on attack type
-    // Sidekick and uppercut hit the face, other attacks hit the stomach
-    if (attackType === 'sidekick' || attackType === 'uppercut') {
+    // Play hurt animation if we know the attack type
+    if (attackType) {
       this.triggerHurt();
-    } else if (attackType) {
-      this.triggerHurtStomach();
     }
 
     // Check if dead
@@ -635,26 +585,6 @@ export class Enemy {
     this.currentState = EnemyState.HURT;
     this.currentAttackType = null; // Cancel any current attack
     this.sprite.play('enemy-getting-punched');
-
-    // Return to idle after animation completes
-    this.sprite.once('animationcomplete', () => {
-      this.currentState = EnemyState.IDLE;
-      this.sprite.play('enemy-idle');
-    });
-  }
-
-  /**
-   * Trigger the stomach hurt/gut punch animation
-   */
-  public triggerHurtStomach(): void {
-    // Don't interrupt if already hurt
-    if (this.currentState === EnemyState.HURT) {
-      return;
-    }
-
-    this.currentState = EnemyState.HURT;
-    this.currentAttackType = null; // Cancel any current attack
-    this.sprite.play('enemy-getting-punched-stomach');
 
     // Return to idle after animation completes
     this.sprite.once('animationcomplete', () => {
@@ -744,20 +674,6 @@ export class Enemy {
       return new Phaser.Geom.Rectangle(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
     }
 
-    // Jump sidekick hitbox - check if we're on the jump_kick_extend frame
-    if (anim.key === 'enemy-jump-sidekick' && currentFrame.frame.name === 'jump_kick_extend') {
-      const hitboxWidth = 140; // Wide hitbox for the flying kick
-      const hitboxHeight = 100;
-      const offsetX = this.facingRight ? 100 : -100; // Extended reach for aerial kick
-      const offsetY = -20; // Center of body during jump
-
-      // Create hitbox rectangle
-      const hitboxX = this.sprite.x + offsetX - hitboxWidth / 2;
-      const hitboxY = this.sprite.y + offsetY - hitboxHeight / 2;
-
-      return new Phaser.Geom.Rectangle(hitboxX, hitboxY, hitboxWidth, hitboxHeight);
-    }
-
     return null;
   }
 
@@ -770,9 +686,6 @@ export class Enemy {
     }
     if (this.currentAttackType === 'sidekick') {
       return 15; // Sidekick does more damage than punch
-    }
-    if (this.currentAttackType === 'jump_sidekick') {
-      return 20; // Jump sidekick does the most damage
     }
     return 0;
   }

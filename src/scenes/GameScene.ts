@@ -147,7 +147,7 @@ export class GameScene extends Phaser.Scene {
       this,
       this.player.getSprite(),
       this.player.getMaxHealth(),
-      'JUAN',
+      'APE',
       playerHeadOffset
     );
     this.player.setHealthBar(this.playerHealthBar);

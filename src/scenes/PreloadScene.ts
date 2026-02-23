@@ -11,10 +11,8 @@ import { GAME_WIDTH, GAME_HEIGHT } from '../config/GameConfig';
 import juanIdleUrl from '../assets/juan/animations/juan_gorilla_idle.png';
 import juanRunUrl from '../assets/juan/animations/juan_gorilla_running.png';
 import juanJumpUrl from '../assets/juan/animations/juan_gorilla_jumping.png';
-import juanKickUrl from '../assets/juan/animations/juan_sidekick.png';
 import juanPunchUrl from '../assets/juan/animations/juan_gorilla_punch.png';
 import juanUppercutUrl from '../assets/juan/animations/juan_gorilla_uppercut.png';
-import juanSidekick2Url from '../assets/juan/animations/sidekick_2_animation.png';
 import juanAerialPunchUrl from '../assets/juan/animations/juan_gorilla_aerial_punch.png';
 import juanGettingPunchedUrl from '../assets/juan/animations/juan_gorilla_getting_punched.png';
 import juanGettingPunchedStomachUrl from '../assets/juan/animations/juan_getting_punched_stomach.png';
@@ -48,11 +46,9 @@ import powerBoosterUrl from '../assets/props/powerups/power-booster.png';
 // Enemy sprites
 import enemyIdleUrl from '../assets/enemy_human/enemy_blockhead_idle.png';
 import enemyRunningUrl from '../assets/enemy_human/enemy_blockhead_running.png';
-import enemyPunchUrl from '../assets/enemy_human/enemy_punch.png';
-import enemySidekickUrl from '../assets/enemy_human/enemy_sidekick_animation.png';
-import enemyJumpSidekickUrl from '../assets/enemy_human/enemy_jump_sidekick.png';
-import enemyGettingPunchedUrl from '../assets/enemy_human/enemy_getting_punched_animation.png';
-import enemyGettingPunchedStomachUrl from '../assets/enemy_human/enemy_getting_punched_stomach.png';
+import enemyPunchUrl from '../assets/enemy_human/enemy_blockhead_punch.png';
+import enemySidekickUrl from '../assets/enemy_human/enemy_blockhead_sidekick.png';
+import enemyGettingPunchedUrl from '../assets/enemy_human/enemy_blockhead_getting_punched.png';
 
 export class PreloadScene extends Phaser.Scene {
   constructor() {
@@ -80,11 +76,6 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 400,
     });
-    // sidekick: 1200x1200, 6 columns x 3 rows, 6 frames used (row 1)
-    this.load.spritesheet('juan-kick', juanKickUrl, {
-      frameWidth: 200,
-      frameHeight: 400,
-    });
     // punch: 6 standard frames (guard, wind-up, jab, impact, retract, recovery)
     this.load.spritesheet('juan-punch', juanPunchUrl, {
       frameWidth: 200,
@@ -92,11 +83,6 @@ export class PreloadScene extends Phaser.Scene {
     });
     // uppercut: 5 frames
     this.load.spritesheet('juan-uppercut', juanUppercutUrl, {
-      frameWidth: 200,
-      frameHeight: 400,
-    });
-    // sidekick2: 1200x800, frames 4-5 and 6-7 are wide (400px)
-    this.load.spritesheet('juan-sidekick2', juanSidekick2Url, {
       frameWidth: 200,
       frameHeight: 400,
     });
@@ -178,18 +164,8 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 200,
       frameHeight: 400,
     });
-    // enemy_jump_sidekick: 1200x1200 (6x3 grid), 4 prep frames + 1 wide extended kick
-    this.load.spritesheet('enemy-jump-sidekick', enemyJumpSidekickUrl, {
-      frameWidth: 200,
-      frameHeight: 400,
-    });
     // enemy_getting_punched: 5 frames horizontal strip (hurt/damage reaction)
     this.load.spritesheet('enemy-getting-punched', enemyGettingPunchedUrl, {
-      frameWidth: 200,
-      frameHeight: 400,
-    });
-    // enemy_getting_punched_stomach: 5 frames horizontal strip (gut punch reaction)
-    this.load.spritesheet('enemy-getting-punched-stomach', enemyGettingPunchedStomachUrl, {
       frameWidth: 200,
       frameHeight: 400,
     });
@@ -253,10 +229,8 @@ export class PreloadScene extends Phaser.Scene {
     this.textures.get('juan-idle').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('running-animation').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-jump').setFilter(Phaser.Textures.FilterMode.LINEAR);
-    this.textures.get('juan-kick').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-punch').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-uppercut').setFilter(Phaser.Textures.FilterMode.LINEAR);
-    this.textures.get('juan-sidekick2').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-aerial-punch').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-getting-punched').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('juan-getting-punched-stomach').setFilter(Phaser.Textures.FilterMode.LINEAR);
@@ -269,9 +243,7 @@ export class PreloadScene extends Phaser.Scene {
     this.textures.get('enemy-running').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('enemy-punch').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('enemy-sidekick').setFilter(Phaser.Textures.FilterMode.LINEAR);
-    this.textures.get('enemy-jump-sidekick').setFilter(Phaser.Textures.FilterMode.LINEAR);
     this.textures.get('enemy-getting-punched').setFilter(Phaser.Textures.FilterMode.LINEAR);
-    this.textures.get('enemy-getting-punched-stomach').setFilter(Phaser.Textures.FilterMode.LINEAR);
 
     // Add custom wide frame for enemy punch (frames 3+4 combined = 400px wide)
     // Frames 3 and 4 are the same, so combine them into a single wide frame
@@ -282,16 +254,6 @@ export class PreloadScene extends Phaser.Scene {
     const enemySidekickTexture = this.textures.get('enemy-sidekick');
     enemySidekickTexture.add('kick_extend', 0, 600, 0, 400, 400);   // slots 4+5: x=0, y=400, width=400, height=400
     enemySidekickTexture.add('kick_follow', 0, 0, 400, 400, 400); // slots 6+7: x=400, y=400, width=400, height=400
-
-    // Add custom wide frame for enemy jump sidekick (extended kick in row 2)
-    const enemyJumpSidekickTexture = this.textures.get('enemy-jump-sidekick');
-    enemyJumpSidekickTexture.add('jump_kick_extend', 0, 600, 0, 400, 400);   // slots 4+5: x=0, y=400, width=400, height=400
-    enemyJumpSidekickTexture.add('jump_kick_follow', 0, 0, 400, 400, 400); // slots 6+7: x=400, y=400, width=400, height=400
-
-    // Add custom wide frames for sidekick2 (frames 4-5 and 6-7 are 400px wide)
-    const sidekick2Texture = this.textures.get('juan-sidekick2');
-    sidekick2Texture.add('kick_extend', 0, 800, 0, 400, 400);   // frames 4+5: x=800, y=0, width=400
-    sidekick2Texture.add('kick_follow', 0, 0, 400, 400, 400);   // frames 6+7: x=0, y=400, width=400
 
     // Add custom wide frames for aerial punch (frames 1+2 and 3+4 are 400px wide each)
     // Layout: frame0 (200px) | frames1+2 (400px) | frames3+4 (400px) | frame5 (200px)
