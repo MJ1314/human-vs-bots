@@ -273,7 +273,7 @@ export class PreloadScene extends Phaser.Scene {
     // Wait for custom fonts to be fully loaded before starting menu
     this.waitForFonts().then(() => {
       this.time.delayedCall(200, () => {
-        this.scene.start('Menu');
+        this.scene.start('Versus');
       });
     });
   }

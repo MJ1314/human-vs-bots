@@ -489,7 +489,7 @@ export class PauseMenu {
     this.scene.physics.resume();
     this.scene.cameras.main.fadeOut(500, 0, 0, 0);
     this.scene.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.scene.start('Menu');
+      this.scene.scene.start('Versus');
     });
   }
 
