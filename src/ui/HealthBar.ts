@@ -32,7 +32,6 @@ export class HealthBar {
   private fillBar: Phaser.GameObjects.Graphics;
   private border: Phaser.GameObjects.Graphics;
   private glowEffect: Phaser.GameObjects.Graphics;
-  private label: Phaser.GameObjects.Text;
   private hpText: Phaser.GameObjects.Text;
 
   private targetSprite: Phaser.Physics.Arcade.Sprite;
@@ -76,16 +75,6 @@ export class HealthBar {
     this.border = scene.add.graphics();
     this.drawBorder();
     this.container.add(this.border);
-
-    // Create label (character name)
-    this.label = scene.add.text(CONFIG.WIDTH / 2, -20, characterName, {
-      fontFamily: 'monospace',
-      fontSize: '12px',
-      color: '#ffffff',
-      fontStyle: 'bold',
-    });
-    this.label.setOrigin(0.5, 1);
-    this.container.add(this.label);
 
     // Create HP text
     this.hpText = scene.add.text(CONFIG.WIDTH / 2, CONFIG.HEIGHT / 2, '', {
@@ -169,13 +158,10 @@ export class HealthBar {
     // Color change based on health percentage
     if (this.targetProgress <= 0.3) {
       this.hpText.setColor('#ff4444');
-      this.label.setColor('#ff4444');
     } else if (this.targetProgress <= 0.6) {
       this.hpText.setColor('#ffaa44');
-      this.label.setColor('#ffaa44');
     } else {
       this.hpText.setColor('#ffffff');
-      this.label.setColor('#ffffff');
     }
   }
 

@@ -5,6 +5,7 @@
  */
 
 import Phaser from 'phaser';
+import ologoUrl from '../assets/backgrounds/ologo.png';
 
 export class BootScene extends Phaser.Scene {
   constructor() {
@@ -12,7 +13,7 @@ export class BootScene extends Phaser.Scene {
   }
 
   preload(): void {
-    // Future: Load loading bar assets here
+    this.load.image('ologo', ologoUrl);
   }
 
   create(): void {

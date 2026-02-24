@@ -25,10 +25,10 @@ const CONFIG = {
   BUTTON_WIDTH: 320,
   BUTTON_HEIGHT: 60,
   BUTTON_COLOR: 0x1e293b,
-  BUTTON_HOVER_COLOR: 0x0f2a1f,
-  BUTTON_SELECTED_COLOR: 0x4ade80, // Green accent
+  BUTTON_HOVER_COLOR: 0x2a150f, // Dark orange tint
+  BUTTON_SELECTED_COLOR: 0xfc4513, // Orange accent (matches loading bar)
   BUTTON_TEXT_COLOR: '#ffffff',
-  BUTTON_SELECTED_TEXT_COLOR: '#4ade80',
+  BUTTON_SELECTED_TEXT_COLOR: '#fc4513',
   BUTTON_SPACING: 25,
   /** Font */
   FONT_FAMILY: 'Quantico',

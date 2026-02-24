@@ -31,6 +31,7 @@ import serverLabBgUrl from '../assets/backgrounds/server_lab.png';
 import overgrownCityBgUrl from '../assets/backgrounds/overgrown_city.png';
 import overgrownCitySunsetBgUrl from '../assets/backgrounds/overgrown_city_sunset.png';
 import versusBgUrl from '../assets/backgrounds/versus.png';
+import aa2LogoUrl from '../assets/backgrounds/aa2.png';
 
 // Menu assets
 import juanMenuUrl from '../assets/juan_sidekick_main_menu.png';
@@ -57,6 +58,7 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   preload(): void {
+    this.cameras.main.setBackgroundColor('#000000');
     this.createLoadingBar();
 
     // Load Juan's sprite sheets (using Vite-imported URLs)
@@ -132,6 +134,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('bg-overgrown-city', overgrownCityBgUrl);
     this.load.image('bg-overgrown-city-sunset', overgrownCitySunsetBgUrl);
     this.load.image('versus-bg', versusBgUrl);
+    this.load.image('aa2-logo', aa2LogoUrl);
 
     // Load menu assets
     this.load.image('juan-menu', juanMenuUrl);
@@ -179,6 +182,14 @@ export class PreloadScene extends Phaser.Scene {
     const barX = (GAME_WIDTH - barWidth) / 2;
     const barY = (GAME_HEIGHT - barHeight) / 2;
 
+    // Logo at top center (loaded in BootScene)
+    const logo = this.add.image(GAME_WIDTH / 2, 80, 'ologo');
+    logo.setOrigin(0.5, 0);
+    const maxLogoWidth = 480;
+    if (logo.width > maxLogoWidth) {
+      logo.setDisplaySize(maxLogoWidth, (logo.height / logo.width) * maxLogoWidth);
+    }
+
     const bgBar = this.add.graphics();
     bgBar.fillStyle(0x333333, 1);
     bgBar.fillRect(barX, barY, barWidth, barHeight);
@@ -201,12 +212,13 @@ export class PreloadScene extends Phaser.Scene {
 
     this.load.on('progress', (value: number) => {
       progressBar.clear();
-      progressBar.fillStyle(0x4ade80, 1);
+      progressBar.fillStyle(0xfc4513, 1);
       progressBar.fillRect(barX, barY, barWidth * value, barHeight);
       percentText.setText(`${Math.round(value * 100)}%`);
     });
 
     this.load.on('complete', () => {
+      logo.destroy();
       progressBar.destroy();
       bgBar.destroy();
       loadingText.destroy();

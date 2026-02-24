@@ -32,7 +32,7 @@ export class GameScene extends Phaser.Scene {
   private playerHealthBar!: HealthBar;
   private enemyHealthBars: Map<Enemy, HealthBar> = new Map();
   private gameEnded: boolean = false;
-  private debugUpdateHandler: (() => void) | null = null;
+  private gameplayLogo!: Phaser.GameObjects.Image;
 
   // Traditional AI controllers (FSM-based)
   private enemyAIControllers: EnemyAIController[] = [];
@@ -110,9 +110,6 @@ export class GameScene extends Phaser.Scene {
     this.setupCamera();
     console.log('[GameScene] Camera set up');
 
-    this.createDebugInfo();
-    console.log('[GameScene] Debug info created');
-
     this.createPauseMenu();
     console.log('[GameScene] PauseMenu created');
 
@@ -121,6 +118,8 @@ export class GameScene extends Phaser.Scene {
 
     this.createHealthBars();
     console.log('[GameScene] HealthBars created');
+
+    this.createGameplayLogo();
 
     // Countdown before match starts (3, 2, 1) - movement gated by registry 'matchStarted'
     this.registry.set('matchStarted', false);
@@ -161,6 +160,7 @@ export class GameScene extends Phaser.Scene {
     this.time.delayedCall(3000, () => {
       countdownText.destroy();
       this.registry.set('matchStarted', true);
+      this.gameplayLogo.setVisible(true);
     });
   }
 
@@ -337,35 +337,26 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.startFollow(this.player.getSprite(), true, 0.1, 0.1);
   }
 
-  private createDebugInfo(): void {
-    console.log('[GameScene] Creating debug info');
-    const debugText = this.add.text(10, 10, '', {
-      fontFamily: 'monospace',
-      fontSize: '14px',
-      color: '#00ff00',
-      backgroundColor: '#000000',
-      padding: { x: 5, y: 5 },
-    });
-    debugText.setScrollFactor(0);
-    debugText.setDepth(1000);
-
-    // Store the handler so we can remove it in shutdown()
-    this.debugUpdateHandler = () => {
-      const sprite = this.player.getSprite();
-      const body = sprite.body as Phaser.Physics.Arcade.Body;
-      debugText.setText([
-        `FPS: ${Math.round(this.game.loop.actualFps)}`,
-        `Player: (${Math.round(sprite.x)}, ${Math.round(sprite.y)})`,
-        `Velocity: (${Math.round(body?.velocity.x ?? 0)}, ${Math.round(body?.velocity.y ?? 0)})`,
-        `On Ground: ${body?.blocked.down ?? false}`,
-      ].join('\n'));
-    };
-    this.events.on('update', this.debugUpdateHandler);
+  private createGameplayLogo(): void {
+    this.gameplayLogo = this.add.image(GAME_WIDTH / 2, 50, 'aa2-logo');
+    this.gameplayLogo.setOrigin(0.5, 0);
+    this.gameplayLogo.setScrollFactor(0);
+    this.gameplayLogo.setDepth(800);
+    this.gameplayLogo.setVisible(false); // Show only after countdown
+    const maxLogoWidth = 360;
+    if (this.gameplayLogo.width > maxLogoWidth) {
+      this.gameplayLogo.setDisplaySize(maxLogoWidth, (this.gameplayLogo.height / this.gameplayLogo.width) * maxLogoWidth);
+    }
   }
 
   private updateCounter = 0;
   
   update(): void {
+    // Keep gameplay logo fixed at top center (camera follows player)
+    if (this.gameplayLogo?.active) {
+      this.gameplayLogo.setX(this.cameras.main.scrollX + GAME_WIDTH / 2);
+    }
+
     try {
       // Log first few updates to verify update loop is running
       if (this.updateCounter < 3) {
@@ -698,12 +689,6 @@ export class GameScene extends Phaser.Scene {
   shutdown(): void {
     console.log('[GameScene] Shutting down...');
     
-    // CRITICAL: Remove the debug update handler to prevent it from running after scene restart
-    if (this.debugUpdateHandler) {
-      this.events.off('update', this.debugUpdateHandler);
-      this.debugUpdateHandler = null;
-    }
-    
     // Destroy UI components with their event listeners
     this.pauseMenu?.destroy();
     this.gameOverOverlay?.destroy();
@@ -712,6 +697,8 @@ export class GameScene extends Phaser.Scene {
     this.playerHealthBar?.destroy();
     this.enemyHealthBars.forEach((healthBar) => healthBar.destroy());
     this.enemyHealthBars.clear();
+
+    this.gameplayLogo?.destroy();
     
     // Reset arrays to prevent stale references
     this.powerBoosters = [];
