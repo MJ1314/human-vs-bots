@@ -40,7 +40,6 @@ export class HealthBar {
   private targetProgress: number = 1;
   private maxHealth: number;
   private currentHealth: number;
-  private characterName: string;
   private headOffset: number;
 
   constructor(
@@ -54,7 +53,6 @@ export class HealthBar {
     this.targetSprite = targetSprite;
     this.maxHealth = maxHealth;
     this.currentHealth = maxHealth;
-    this.characterName = characterName;
     this.headOffset = headOffset;
 
     // Create container for all bar elements
@@ -184,7 +182,7 @@ export class HealthBar {
   /**
    * Update loop - follows character and smooths progress bar
    */
-  private update(_time: number, delta: number): void {
+  private update(_time: number, _delta: number): void {
     // Follow character position - centered horizontally, above head vertically
     // Since sprites have origin at feet (0.5, 1), top of frame is at y - displayHeight
     // headOffset accounts for empty space at the top of the sprite frame

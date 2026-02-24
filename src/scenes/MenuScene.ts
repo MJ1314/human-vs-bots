@@ -25,7 +25,6 @@ export class MenuScene extends Phaser.Scene {
   private juanSprite?: Phaser.GameObjects.Image;
   private swooshGraphics?: Phaser.GameObjects.Graphics;
   private buttonParticles?: Phaser.GameObjects.Particles.ParticleEmitter;
-  private selectionOverlay?: Phaser.GameObjects.Graphics;
   private buttonContainer?: Phaser.GameObjects.Graphics;
   private buttonGroup?: Phaser.GameObjects.Container;
 
@@ -384,44 +383,6 @@ export class MenuScene extends Phaser.Scene {
     const centerX = this.BUTTON_X + this.BUTTON_WIDTH / 2;
 
     this.buttonParticles.setPosition(centerX, y);
-  }
-
-  private createSelectionOverlay(): void {
-    // Create a graphics object for the green glowing border overlay
-    this.selectionOverlay = this.add.graphics();
-    this.selectionOverlay.setDepth(15); // On top of everything
-
-    // Add postFX glow for extra luminosity
-    this.selectionOverlay.postFX?.addGlow(0x4ade80, 0.1, 0, false, 0.5, 5);
-  }
-
-  private updateSelectionOverlay(): void {
-    if (!this.selectionOverlay) return;
-
-    this.selectionOverlay.clear();
-
-    // Get the selected button position
-    const y = this.BUTTON_Y_START + this.selectedIndex * this.BUTTON_SPACING;
-    const x = this.BUTTON_X ;
-    const topY = y - this.BUTTON_HEIGHT / 2;
-
-    const glowColor = 0x4ade80; // Green glow color
-
-    // Draw multiple layers for glow effect (outer to inner)
-    for (let i = 6; i > 0; i--) {
-      this.selectionOverlay.lineStyle(i * 3, glowColor, 0.01);
-      this.selectionOverlay.strokeRoundedRect(
-        x - i * 2,
-        topY - i * 2,
-        100,
-        this.BUTTON_HEIGHT + i * 4,
-        8
-      );
-    }
-
-    // Draw the main green border on top
-    this.selectionOverlay.lineStyle(3, glowColor, 0.2);
-    this.selectionOverlay.strokeRoundedRect(x, topY, this.BUTTON_WIDTH, this.BUTTON_HEIGHT, 8);
   }
 
   private drawButtonFrame(

@@ -154,7 +154,7 @@ export class EnemyAIController {
   /**
    * Execute behavior for the current state
    */
-  private executeStateBehavior(distance: number, delta: number): void {
+  private executeStateBehavior(_distance: number, delta: number): void {
     switch (this.currentState) {
       case AIState.IDLE:
         this.executeIdleBehavior();
@@ -185,7 +185,7 @@ export class EnemyAIController {
   /**
    * CHASE state behavior - move toward the player
    */
-  private executeChaseBehavior(delta: number): void {
+  private executeChaseBehavior(_delta: number): void {
     const playerX = this.player.getSprite().x;
     const enemyX = this.enemy.getX();
     

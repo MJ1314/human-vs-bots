@@ -299,7 +299,6 @@ export class Enemy {
   }
 
   private performSidekick(): void {
-    const body = this.sprite.body as Phaser.Physics.Arcade.Body;
     this.currentState = EnemyState.ATTACKING;
     // Always use regular sidekick now
     this.currentAttackType = 'sidekick';

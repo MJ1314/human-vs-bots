@@ -8,8 +8,6 @@ import Phaser from 'phaser';
 import { GAME_WIDTH, GAME_HEIGHT } from '../config/GameConfig';
 
 export class StoryScene extends Phaser.Scene {
-  private menuMusic?: Phaser.Sound.BaseSound;
-
   constructor() {
     super({ key: 'Story' });
   }
@@ -23,7 +21,7 @@ export class StoryScene extends Phaser.Scene {
     // Continue menu music if playing
     const existingMusic = this.sound.get('menu-music');
     if (existingMusic && existingMusic.isPlaying) {
-      this.menuMusic = existingMusic;
+      // Music continues from menu
     }
 
     // Title
